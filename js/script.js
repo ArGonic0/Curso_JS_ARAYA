@@ -173,17 +173,26 @@ function verCarrito() {
     if (opcion === true) {
         let confirmacion = prompt("Ingrese su contraseña para confirmar la compra:");
         let passValida=false;
+
+        if(confirmacion==password){
+            passValida=true;
+            alert("Compra confirmada. ¡Gracias por su compra!");
+            carrito = [];
+        } else if(confirmacion===null){
+            passValida=true;
+            alert("Compra cancelada.");
+        }
         while(passValida==false){
             confirmacion = prompt("Contraseña incorrecta. Intente nuevamente:");
             if(confirmacion==password){
                 passValida=true;
                 alert("Compra confirmada. ¡Gracias por su compra!");
+                carrito = [];
             } else if(confirmacion===null){
                 passValida=true;
                 alert("Compra cancelada.");
             }
         }
-        carrito = [];
     }
 }
 
