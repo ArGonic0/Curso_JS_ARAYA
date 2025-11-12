@@ -33,7 +33,7 @@ let password = "";
 // ====== Funciones ======
 
 function inicioSesion() {
-    alert("Bienvenido al simulador de E-Commerce de Jardinería");
+    alert("Bienvenido al simulador de E-Commerce de Jardinería\nPor favor, inicie sesión (cualquier usuario y contraseña son válidos).");
 
     usuario = prompt("Ingrese su nombre de usuario:");
     while (!usuario) {
@@ -127,19 +127,6 @@ function explorarCategoria(categoria) {
                     if (confirmar) {
                         carrito.push({ producto: producto, cantidad: cantidad });
                         alert(cantidad + " x " + producto.nombre + " agregado al carrito por $" + total + ".");
-
-                        //let siguiente = prompt(
-                        //    "¿Qué desea hacer ahora?\n" +
-                        //    "1 - Seguir comprando en esta categoría\n" +
-                        //    "2 - Ir al carrito\n" +
-                        //    "3 - Volver al menú principal"
-                        //);
-//
-                        //if (siguiente === "2") {
-                        //    verCarrito();
-                        //} else if (siguiente === "3") {
-                        //    salir = true;
-                        //}
                     }
                 } else {
                 alert("Cantidad inválida.");
