@@ -1,20 +1,40 @@
 <!DOCTYPE html>
 <html lang="es">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" width=device-width initial-scale=1>
-        <title>Proyecto Curso JS ARAYA</title>
-    </head>
-    <body>
-        <header>
-            <h1>Proyecto del Curso de JavaScript - ARAYA</h1>
-        </header>
-        <main>
-            <h2>Primera Entrega</h2>
-        </main>
-        <footer>
-            <p>Simulacion e-commerce</p>
-        </footer>
-        <script src="js/script.js"></script> 
-    </body>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" width=device-width initial-scale=1>
+    <title>Proyecto Curso JS ARAYA</title>
+    <link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+
+    <header>
+        <h1>Proyecto del Curso de JavaScript - ARAYA</h1>
+        <h2>Segunda Entrega</h2>
+        <div id="userInfo"></div>
+        <button id="closeBtn" class="hidden">Cerrar Sesión</button>
+    </header>
+
+    <main>
+        <section id="storeSection">
+            <h2>Tienda</h2>
+            <div id="productContainer">
+                </div>
+            <button id="backToCategoriesBtn" class="hidden">Volver a Categorías</button>
+        </section>
+
+        <section id="cartSection">
+            <h2>Carrito (<span id="cartCount">0</span>)</h2>
+            <div id="cartItems">
+                <p id="emptyCartMessage">El carrito está vacío.</p>
+            </div>
+            <div id="cartSummary">
+                <p>Total: **$<span id="cartTotal">0</span>**</p>
+                <button id="checkoutBtn" disabled>Finalizar Compra</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/scriptDOM.js"></script>
+</body>
 </html>
