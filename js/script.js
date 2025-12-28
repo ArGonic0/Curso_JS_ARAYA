@@ -255,6 +255,52 @@ function inicioSesion() {
     return true;
 }
 
+// ====== Clima y locacion ======
+function obtenerClimaConUbicacion() {
+    if (!navigator.geolocation) {
+        console.error("Geolocalización no soportada");
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+        async (position) => {
+            try {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature`;
+
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error("Error al obtener el clima");
+                }
+
+                const data = await response.json();
+
+                //const temp = data.current.temperature_2m;
+                const temp= 50; // Valor fijo para pruebas
+                let recomendacion = " Evite regar las plantas en las horas de mayor intensidad del sol.";
+                if(temp>30){
+                    recomendacion = " 🔥 Recuerde regar las plantas con frecuencia debido al calor.";
+                }
+                else if(temp<10){
+                    recomendacion = " ❄️ Proteja sus plantas del frío.";
+                }
+
+                document.getElementById("clima").innerHTML = `
+                    🌡️ Temperatura Actual: ${temp}°C ${recomendacion}
+                `;
+        } catch (error) {
+            console.error(error);
+        }
+        },
+        (error) => {
+            console.error("Permiso de ubicación denegado", error);
+        }
+    );
+}
+
+
 // ====== Inicio ======
 
 function init() {
@@ -264,12 +310,17 @@ function init() {
         actualizarCarritoDOM();
         mostrarCategorias();
         
+        obtenerClimaConUbicacion();
+        
         // Asignar eventos a botones globales
         backToCategoriesBtn.addEventListener('click', mostrarCategorias);
         checkoutBtn.addEventListener('click', finalizarCompra);
         closeBtn.addEventListener('click', cerrarSesion);
     }
 }
+
+
+
 
 
 
