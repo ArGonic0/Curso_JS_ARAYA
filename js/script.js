@@ -31,6 +31,12 @@ let carrito = [];
 let usuario = "";
 let password = "";
 
+const TIEMPO_INACTIVIDAD = 5 * 60 * 1000; // 5 minutos
+let timeoutSesion = null;
+let intervaloTimerVisual = null;
+let tiempoRestante = TIEMPO_INACTIVIDAD;
+
+
 const productContainer = document.getElementById('productContainer');
 const backToCategoriesBtn = document.getElementById('backToCategoriesBtn');
 const cartItemsContainer = document.getElementById('cartItems');
@@ -43,7 +49,7 @@ const closeBtn = document.getElementById('closeBtn');
 
 let categoriaActual = null; // Para saber si estamos viendo categorías o productos
 
-// ====== Funciones de Storage ======
+// ====== Funciones de Storage y Sesion ======
 
 function guardarCarrito() {
     localStorage.setItem('carrito', JSON.stringify(carrito));
@@ -72,6 +78,57 @@ function cerrarSesion() {
     localStorage.removeItem('password');
     localStorage.removeItem('carrito');
     location.reload();
+}
+
+
+function escucharActividadUsuario() {
+    const eventos = ["click", "keydown", "scroll"];
+
+    eventos.forEach(evento => {
+        document.addEventListener(evento, reiniciarTimeoutSesion);
+    });
+}
+
+function formatearTiempo(ms) {
+    const totalSegundos = Math.floor(ms / 1000);
+    const minutos = String(Math.floor(totalSegundos / 60)).padStart(2, "0");
+    const segundos = String(totalSegundos % 60).padStart(2, "0");
+    return `Tiempo restante: ${minutos}:${segundos}`;
+}
+
+function iniciarTimerVisual() {
+    const timerDiv = document.getElementById("sessionTimer");
+
+    if (intervaloTimerVisual) {
+        clearInterval(intervaloTimerVisual);
+    }
+
+    tiempoRestante = TIEMPO_INACTIVIDAD;
+    timerDiv.textContent = formatearTiempo(tiempoRestante);
+
+    intervaloTimerVisual = setInterval(() => {
+        tiempoRestante -= 1000;
+
+        if (tiempoRestante <= 0) {
+            clearInterval(intervaloTimerVisual);
+            timerDiv.textContent = "00:00";
+            return;
+        }
+
+        timerDiv.textContent = formatearTiempo(tiempoRestante);
+    }, 1000);
+}
+
+function reiniciarTimeoutSesion() {
+    if (timeoutSesion) {
+        clearTimeout(timeoutSesion);
+    }
+
+    timeoutSesion = setTimeout(() => {
+        alert("Sesión cerrada por inactividad.");
+        cerrarSesion();
+    }, TIEMPO_INACTIVIDAD);
+    iniciarTimerVisual();
 }
 
 // ====== Funciones de Tienda ======
@@ -316,6 +373,9 @@ function init() {
         backToCategoriesBtn.addEventListener('click', mostrarCategorias);
         checkoutBtn.addEventListener('click', finalizarCompra);
         closeBtn.addEventListener('click', cerrarSesion);
+
+        escucharActividadUsuario();
+        reiniciarTimeoutSesion();
     }
 }
 

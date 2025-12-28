@@ -25,6 +25,12 @@ header h1 {
     color: #0077b6;
 }
 
+#sessionTimer {
+    font-weight: bold;
+    color: #0077b6;
+    margin-left: 15px;
+}
+
 main {
     display: flex;
     gap: 30px;
