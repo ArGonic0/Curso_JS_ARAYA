@@ -334,8 +334,8 @@ function obtenerClimaConUbicacion() {
 
                 const data = await response.json();
 
-                //const temp = data.current.temperature_2m;
-                const temp= 50; // Valor fijo para pruebas
+                const temp = data.current.temperature_2m;
+                //const temp= 50; // Valor fijo para pruebas
                 let recomendacion = " Evite regar las plantas en las horas de mayor intensidad del sol.";
                 if(temp>30){
                     recomendacion = " 🔥 Recuerde regar las plantas con frecuencia debido al calor.";
