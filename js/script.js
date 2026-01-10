@@ -125,7 +125,10 @@ function reiniciarTimeoutSesion() {
     }
 
     timeoutSesion = setTimeout(() => {
-        alert("Sesión cerrada por inactividad.");
+        swal.fire({
+            icon: "info",
+            title: "Sesión cerrada por inactividad."
+        });
         cerrarSesion();
     }, TIEMPO_INACTIVIDAD);
     iniciarTimerVisual();
@@ -184,7 +187,10 @@ function explorarCategoria(categoria) {
                 agregarAlCarrito(producto, cantidad);
                 qtyInput.value = 1; // Resetear cantidad
             } else {
-                alert("Cantidad inválida.");
+                Swal.fire({
+                    icon: "error",
+                    text: "Cantidad Invalida."
+                });
             }
         });
         productList.appendChild(productCard);
@@ -205,7 +211,6 @@ function agregarAlCarrito(producto, cantidad) {
 
     guardarCarrito();
     actualizarCarritoDOM();
-    alert(`${cantidad} x ${producto.nombre} agregado al carrito por $${total}.`);
 }
 
 function actualizarCarritoDOM() {
@@ -244,71 +249,118 @@ function actualizarCarritoDOM() {
 }
 
 function quitarDelCarrito(index) {
-    if (confirm(`¿Está seguro de querer quitar ${carrito[index].producto.nombre} del carrito?`)) {
-        carrito.splice(index, 1);
-        guardarCarrito();
-        actualizarCarritoDOM();
-    }
+    Swal.fire({
+        title: "Quitar producto",
+        text: "¿Seguro que desea quitar este ítem?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, quitar",
+        cancelButtonText: "Cancelar"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            carrito.splice(index, 1);
+            guardarCarrito();
+            actualizarCarritoDOM();
+        }
+    });
 }
-
 function finalizarCompra() {
     if (carrito.length === 0) return;
 
-    let confirmacion = prompt(`Ingrese su contraseña para confirmar la compra por un total de $${cartTotalSpan.textContent}:`);
-    
-    if (confirmacion === password) {
-        alert("Compra confirmada. ¡Gracias por su compra!");
+    Swal.fire({
+        title: "Confirmar compra",
+        html: `
+            <p>Total a pagar: <strong>$${cartTotalSpan.textContent}</strong></p>
+            <input id="swal-pass-confirm" type="password" class="swal2-input" placeholder="Ingrese su contraseña">
+        `,
+        confirmButtonText: "Confirmar",
+        showCancelButton: true,
+        focusConfirm: false,
+        preConfirm: () => {
+            const pass = document.getElementById("swal-pass-confirm").value;
+            if (!pass) {
+                Swal.showValidationMessage("Debe ingresar su contraseña");
+                return false;
+            }
+            return pass;
+        }
+    }).then(result => {
+
+        if (!result.isConfirmed) return;
+
+        const passIngresada = result.value;
+
+        if (passIngresada !== password) {
+            Swal.fire({
+                icon: "error",
+                title: "Contraseña incorrecta",
+                text: "Intente nuevamente."
+            });
+            return;
+        }
+
+        Swal.fire({
+            icon: "success",
+            title: "Compra confirmada",
+            text: "¡Gracias por su compra!"
+        });
+
         carrito = [];
         guardarCarrito();
         actualizarCarritoDOM();
-    } else if (confirmacion === null) {
-        alert("Compra cancelada.");
-    } else {
-        while (confirmacion !== password && confirmacion !== null) {
-            confirmacion = prompt("Contraseña incorrecta. Intente nuevamente:");
-            if (confirmacion === password) {
-                alert("Compra confirmada. ¡Gracias por su compra!");
-                carrito = [];
-                guardarCarrito();
-                actualizarCarritoDOM();
-                break;
-            } else if (confirmacion === null) {
-                alert("Compra cancelada.");
-                break;
-            }
-        }
-    }
+    });
 }
+
 
 // ====== Funciones de Sesión ======
 
 function inicioSesion() {
     if (cargarSesion()) {
-        alert(`Bienvenido de vuelta, ${usuario}.`);
+        Swal.fire({
+            text: `Bienvenido de vuelta, ${usuario}.`
+        });
         closeBtn.classList.remove('hidden');
+        userInfoDiv.textContent = `Usuario: ${usuario}`;
         return true;
     }
 
-    alert("Bienvenido al simulador de E-Commerce de Jardinería\nPor favor, inicie sesión (cualquier usuario y contraseña son válidos).");
+    Swal.fire({
+        title: 'Ingreso de sesión',
+        html: `
+            <input id="swal-user" class="swal2-input" placeholder="Usuario">
+            <input id="swal-pass" type="password" class="swal2-input" placeholder="Contraseña">
+        `,
+        focusConfirm: false,
+        confirmButtonText: 'Ingresar',
+        preConfirm: () => {
+            const user = document.getElementById('swal-user').value;
+            const pass = document.getElementById('swal-pass').value;
 
-    let user = prompt("Ingrese su nombre de usuario:");
-    while (!user) {
-        user = prompt("Debe ingresar un nombre de usuario.");
-    }
+            if (!user || !pass) {
+                Swal.showValidationMessage("Debe completar ambos campos");
+                return false;
+            }
+            return { user, pass };
+        }
+    }).then(result => {
+        if (!result.isConfirmed) return;
 
-    let pass = prompt("Ingrese su contraseña:");
-    while (!pass) {
-        pass = prompt("Debe ingresar una contraseña.");
-    }
-    
-    usuario = user;
-    password = pass;
-    guardarSesion(usuario, password);
-    
-    alert(`Inicio de sesión correcto. Bienvenido ${usuario}!`);
+        const { user, pass } = result.value;
 
-    closeBtn.classList.remove('hidden');    
+        usuario = user;
+        password = pass;
+        guardarSesion(usuario, password);
 
+        Swal.fire({
+            icon: 'success',
+            title: 'Sesión iniciada',
+            text: `Bienvenido ${usuario}`
+        });
+        userInfoDiv.textContent = `Usuario: ${usuario}`;
+        closeBtn.classList.remove('hidden');
+        escucharActividadUsuario();
+        reiniciarTimeoutSesion();
+    });
     return true;
 }
 
@@ -362,7 +414,6 @@ function obtenerClimaConUbicacion() {
 
 function init() {
     if (inicioSesion()) {
-        userInfoDiv.textContent = `Usuario: ${usuario}`;
         cargarCarrito();
         actualizarCarritoDOM();
         mostrarCategorias();
